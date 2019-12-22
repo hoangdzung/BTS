@@ -4,9 +4,12 @@ from transformers import BertTokenizer
 from keras.preprocessing.sequence import pad_sequences
 from tqdm import tqdm
 import pandas as pd 
+import numpy as np
 import re
 import os
+import logging
 
+logging.getLogger("transformers.tokenization_utils").setLevel(logging.ERROR)
 tokenizer = BertTokenizer.from_pretrained('bert-base-uncased', do_lower_case=True)
 
 def clean_html(raw_html):
@@ -21,7 +24,7 @@ def get_data(sen_set, label_set):
 
     """
     input_ids = []
-    for sens in sen_set:
+    for sens in tqdm(sen_set, desc='process split'):
         for sent in sens:
             encoded_sent = tokenizer.encode(sent,add_special_tokens = True)
             input_ids.append(encoded_sent[:511]+[encoded_sent[-1]])
@@ -48,7 +51,7 @@ def processs_data(data_dir):
     test_sen_set, test_label_set = [], []
     val_sen_set, val_label_set = [], []
 
-    for csv_f in os.listdir(data_dir):
+    for csv_f in tqdm(os.listdir(data_dir), desc='Read csv file'):
         try:
             df = pd.read_csv(os.path.join(data_dir, csv_f))
         except Exception as e:
