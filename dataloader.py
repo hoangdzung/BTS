@@ -104,6 +104,8 @@ def get_all_dataloader(data_dir, processed_dir, batch_size):
         Create 3 dataloaders 
     
     """
+    if not os.path.isdir(processed_dir):
+        os.mkdir(processed_dir)
     processed_train_path = os.path.join(processed_dir, 'train.npz')
     processed_val_path = os.path.join(processed_dir, 'val.npz')
     processed_test_path = os.path.join(processed_dir, 'test.npz')
