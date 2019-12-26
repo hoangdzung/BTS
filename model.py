@@ -6,10 +6,11 @@ class BERT_Regression(nn.Module):
         super().__init__()
         self.BERT_base =  bert_model
         self.linear_model = nn.Sequential(
-            nn.Linear(768, hidden_size),
-            nn.Dropout(dropout),
-            nn.PReLU(),
-            nn.Linear(hidden_size, 1)
+            # nn.Linear(768, hidden_size),
+            # nn.Dropout(dropout),
+            # nn.PReLU(),
+            # nn.Linear(hidden_size, 1)
+            nn.Linear(768, 1)
         )
     
     def forward(self, token_ids, masks):

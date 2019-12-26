@@ -73,11 +73,11 @@ optimizer = AdamW(model.parameters(),lr = args.lr)
 total_steps = len(train_dataloader) * args.epochs
 if new_version:
     scheduler = get_linear_schedule_with_warmup(optimizer,
-                                            num_warmup_steps = 0,
+                                            num_warmup_steps = int(0.1*total_steps),
                                             num_training_steps = total_steps)
 else:
     scheduler = get_linear_schedule_with_warmup(optimizer,
-                                        warmup_steps = 0,
+                                        warmup_steps = int(0.1*total_steps),
                                         t_total = total_steps)
 
 best_val_mse = 1e10
@@ -113,10 +113,10 @@ for epoch_i in range(args.epochs):
     print("")
     print("  Average training loss: {0:.2f}".format(avg_train_loss))
 
-    val_mse = get_mse(model, validation_dataloader)
+    val_mse = get_mse(model, validation_dataloader)/args.batch_size
     if val_mse < best_val_mse:
         best_val_mse = val_mse
-        test_mse = get_mse(model, test_dataloader)
+        test_mse = get_mse(model, test_dataloader)/args.batch_size
     print(" Val mse {}, test mse {}".format(val_mse, test_mse))
 
 print("")
