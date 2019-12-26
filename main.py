@@ -46,9 +46,7 @@ else:
 def get_mse(model, dataloader):
     model.eval()
 
-    eval_loss, eval_accuracy = 0, 0
-    nb_eval_steps, nb_eval_examples = 0, 0
-
+    eval_mse = 0
     for batch in tqdm(dataloader, desc="eval"):
         batch = tuple(t.to(device) for t in batch)
         b_input_ids, b_input_mask, b_labels = batch
@@ -56,8 +54,8 @@ def get_mse(model, dataloader):
         with torch.no_grad():        
             preds = model(b_input_ids, b_input_mask)
         
-        tmp_eval_mse = (preds - b_labels)**2).sum()
-        eval_mse += tmp_eval_accuracy.item()
+        tmp_eval_mse = torch.abs(preds - b_labels).sum()
+        eval_mse += tmp_eval_mse.item()
 
     return eval_mse/len(dataloader)
 
@@ -67,6 +65,9 @@ model = BERT_Regression(bert_model, args.hidden_size, args.dropout)
 model = model.to(device)
 
 train_dataloader, validation_dataloader, test_dataloader = get_all_dataloader(args.data_dir, args.processed_dir, args.batch_size)
+print ("    Number of training examples ", len(train_dataloader))
+print ("    Number of dev examples ", len(validation_dataloader))
+print ("    Number of test examples ", len(test_dataloader))
 
 optimizer = AdamW(model.parameters(),lr = args.lr)
 total_steps = len(train_dataloader) * args.epochs
@@ -95,7 +96,7 @@ for epoch_i in range(args.epochs):
                 
         preds = model(b_input_ids,b_input_mask)
         
-        loss = (preds - b_labels)**2).sum()
+        loss = ((preds - b_labels)**2).sum()
 
         loss.backward()
         total_loss += loss.item()
