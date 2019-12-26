@@ -7,14 +7,15 @@ class BERT_Regression(nn.Module):
         self.BERT_base =  bert_model
         self.linear_model = nn.Sequential(
             # nn.Linear(768, hidden_size),
-            # nn.Dropout(dropout),
+            nn.Dropout(dropout),
             # nn.PReLU(),
             # nn.Linear(hidden_size, 1)
             nn.Linear(768, 1)
         )
     
     def forward(self, token_ids, masks):
-        _, out_bert = self.BERT_base(token_ids, attention_mask=masks)
+        hidden_bert, _ = self.BERT_base(token_ids, attention_mask=masks)
+        out_bert = hidden_bert.mean(1)
         out = self.linear_model(out_bert)
         
         return out

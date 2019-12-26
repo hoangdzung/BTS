@@ -31,6 +31,7 @@ parser.add_argument('--dropout', type=float, default=0.0)
 parser.add_argument('--epochs', type=int, default=10)
 parser.add_argument('--batch_size', type=int, default=32)
 parser.add_argument('--lr', type=float, default=2e-5)
+parser.add_argument('--lr2', type=float, default=0.01)
 parser.add_argument('--seed', type=int, default=42)
 
 args = parser.parse_args()
@@ -73,7 +74,8 @@ print ("    Number of training examples ", len(train_dataloader))
 print ("    Number of dev examples ", len(validation_dataloader))
 print ("    Number of test examples ", len(test_dataloader))
 
-optimizer = AdamW(model.parameters(),lr = args.lr)
+optimizer = AdamW(model.BERT_base.parameters(),lr = args.lr)
+optimizer2 = AdamW(model.linear_model.parameters(),lr = args.lr2)
 total_steps = len(train_dataloader) * args.epochs
 if new_version:
     scheduler = get_linear_schedule_with_warmup(optimizer,
@@ -106,7 +108,7 @@ for epoch_i in range(args.epochs):
         total_loss += loss.item()
 
         torch.nn.utils.clip_grad_norm_(model.parameters(), 1.0)
-
+        optimizer2.step()
         optimizer.step()
         scheduler.step()
         model.zero_grad()
