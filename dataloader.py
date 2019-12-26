@@ -140,7 +140,8 @@ def get_split_dataloader(inputs, masks, labels, batch_size):
     return dataloader
 
 
-def get_all_dataloader(data_dir, processed_dir, datafile, dictfile, batch_size):
+# def get_all_dataloader(data_dir, processed_dir, datafile, dictfile, batch_size):
+def get_all_dataloader(processed_dir, datafile, dictfile, batch_size):
     """ 
         Create 3 dataloaders 
     
