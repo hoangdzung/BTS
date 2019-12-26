@@ -10,12 +10,15 @@ class BERT_Regression(nn.Module):
             nn.Dropout(dropout),
             # nn.PReLU(),
             # nn.Linear(hidden_size, 1)
-            nn.Linear(768, 1)
+            nn.Linear(768*2, 1)
         )
     
-    def forward(self, token_ids, masks):
-        hidden_bert, _ = self.BERT_base(token_ids, attention_mask=masks)
-        out_bert = hidden_bert.mean(1)
+    def forward(self, token_ids, masks, token_ids2, masks2):
+        hidden_bert1, _ = self.BERT_base(token_ids, attention_mask=masks)
+        hidden_bert2, _ = self.BERT_base(token_ids2, attention_mask=masks2)
+        out_bert1 = hidden_bert1.mean(1)
+        out_bert2 = hidden_bert2.mean(1)
+        out_bert = torch.cat([out_bert1, out_bert2], dim=1)
         out = self.linear_model(out_bert)
         
         return out

@@ -96,25 +96,42 @@ def processs_data(datafile, dictfile):
     valid_t, valid_d, val_labels, \
     test_t, test_d, test_labels = cPickle.load(f_data,encoding='latin1')
 
-    train_sen_set = []
-    for idx_set in np.array(train_t) + np.array(train_d):
-        train_sen_set.append(' '.join([iv_dictionary[i] for i in idx_set]))
+    train_sen_t_set = []
+    for idx_set in train_t:
+        train_sen_t_set.append(' '.join([iv_dictionary[i] for i in idx_set]))
 
-    val_sen_set = []
-    for idx_set in np.array(valid_t) + np.array(valid_d):
-        val_sen_set.append(' '.join([iv_dictionary[i] for i in idx_set]))
-    
-    test_sen_set = []
-    for idx_set in np.array(test_t) + np.array(test_d):
-        test_sen_set.append(' '.join([iv_dictionary[i] for i in idx_set]))
-    
-    train_inputs, train_masks, train_labels = get_data([train_sen_set], [train_labels])
-    val_inputs, val_masks, val_labels = get_data([val_sen_set], [val_labels])
-    test_inputs, test_masks, test_labels = get_data([test_sen_set], [test_labels])
+    train_sen_d_set = []
+    for idx_set in train_d:
+        train_sen_d_set.append(' '.join([iv_dictionary[i] for i in idx_set]))
 
-    return (train_inputs, train_masks, train_labels), \
-        (val_inputs, val_masks, val_labels), \
-        (test_inputs, test_masks, test_labels)
+    val_sen_t_set = []
+    for idx_set in valid_t:
+        val_sen_t_set.append(' '.join([iv_dictionary[i] for i in idx_set]))
+    
+    val_sen_d_set = []
+    for idx_set in valid_d:
+        val_sen_d_set.append(' '.join([iv_dictionary[i] for i in idx_set]))
+
+    test_sen_t_set = []
+    for idx_set in test_t:
+        test_sen_t_set.append(' '.join([iv_dictionary[i] for i in idx_set]))
+    
+    test_sen_d_set = []
+    for idx_set in test_d:
+        test_sen_d_set.append(' '.join([iv_dictionary[i] for i in idx_set]))
+
+    train_t_inputs, train_t_masks, train_labels = get_data([train_sen_t_set], [train_labels])
+    train_d_inputs, train_d_masks, train_labels = get_data([train_sen_d_set], [train_labels])
+
+    val_t_inputs, val_t_masks, val_labels = get_data([val_sen_t_set], [val_labels])
+    val_d_inputs, val_d_masks, val_labels = get_data([val_sen_d_set], [val_labels])
+
+    test_t_inputs, test_t_masks, test_labels = get_data([test_sen_t_set], [test_labels])
+    test_d_inputs, test_d_masks, test_labels = get_data([test_sen_d_set], [test_labels])
+
+    return (train_t_inputs, train_t_masks, train_d_inputs, train_d_masks, train_labels), \
+        (val_t_inputs, val_t_masks, val_d_inputs, val_d_masks, val_labels), \
+        (test_t_inputs, test_t_masks,test_d_inputs, test_d_masks, test_labels)
 
 def load_from_npz(processed_path):
     """ 
@@ -124,7 +141,7 @@ def load_from_npz(processed_path):
     data = np.load(processed_path)
     return  data['inputs'], data['masks'], data['labels']
 
-def get_split_dataloader(inputs, masks, labels, batch_size):
+def get_split_dataloader(inputs, masks, inputs2, masks2, labels, batch_size):
     """ 
         Create dataloader for a triple (inputs, masks, labels)
     
@@ -133,7 +150,10 @@ def get_split_dataloader(inputs, masks, labels, batch_size):
     labels = torch.tensor(labels)
     masks = torch.tensor(masks)
 
-    data = TensorDataset(inputs, masks, labels)
+    inputs2 = torch.tensor(inputs2)
+    masks2 = torch.tensor(masks2)
+
+    data = TensorDataset(inputs, masks, inputs2, masks2, labels)
     sampler = RandomSampler(data)
     dataloader = DataLoader(data, sampler=sampler, batch_size=batch_size)
 
@@ -160,15 +180,16 @@ def get_all_dataloader(processed_dir, datafile, dictfile, batch_size):
 
     # Else process
     else:
-        (train_inputs, train_masks, train_labels), (val_inputs, val_masks, val_labels), \
-            (test_inputs, test_masks, test_labels) = processs_data(datafile, dictfile)
+        (train_t_inputs, train_t_masks, train_d_inputs, train_d_masks, train_labels), \
+        (val_t_inputs, val_t_masks, val_d_inputs, val_d_masks, val_labels), \
+        (test_t_inputs, test_t_masks,test_d_inputs, test_d_masks, test_labels) = processs_data(datafile, dictfile)
         
-        np.savez(processed_train_path, inputs=train_inputs, masks=train_masks, labels=train_labels)
-        np.savez(processed_val_path, inputs=val_inputs, masks=val_masks, labels=val_labels)
-        np.savez(processed_test_path, inputs=test_inputs, masks=test_masks, labels=test_labels)
+        # np.savez(processed_train_path, inputs=train_inputs, masks=train_masks, labels=train_labels)
+        # np.savez(processed_val_path, inputs=val_inputs, masks=val_masks, labels=val_labels)
+        # np.savez(processed_test_path, inputs=test_inputs, masks=test_masks, labels=test_labels)
 
-    train_dataloader = get_split_dataloader(train_inputs, train_masks, train_labels, batch_size)
-    val_dataloader = get_split_dataloader(val_inputs, val_masks, val_labels, batch_size)
-    test_dataloader = get_split_dataloader(test_inputs, test_masks, test_labels, batch_size)
+    train_dataloader = get_split_dataloader(train_t_inputs, train_t_masks, train_d_inputs, train_d_masks, train_labels, batch_size)
+    val_dataloader = get_split_dataloader(val_t_inputs, val_t_masks, val_d_inputs, val_d_masks, batch_size)
+    test_dataloader = get_split_dataloader(test_t_inputs, test_t_masks,test_d_inputs, test_d_masks, test_labels, batch_size)
 
     return train_dataloader, val_dataloader, test_dataloader
