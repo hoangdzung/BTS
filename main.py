@@ -22,13 +22,15 @@ else:
 parser = argparse.ArgumentParser()
 parser.add_argument('--data_dir', default='./data/raw')
 parser.add_argument('--processed_dir', default='./data/processed')
+parser.add_argument('--datafile')
+parser.add_argument('--dictfile')
 
 parser.add_argument('--hidden_size', type=int, default=128)
 parser.add_argument('--dropout', type=float, default=0.0)
 
-parser.add_argument('--epochs', type=int, default=100)
+parser.add_argument('--epochs', type=int, default=10)
 parser.add_argument('--batch_size', type=int, default=32)
-parser.add_argument('--lr', type=float, default=0.01)
+parser.add_argument('--lr', type=float, default=2e-5)
 parser.add_argument('--seed', type=int, default=42)
 
 args = parser.parse_args()
@@ -64,7 +66,9 @@ bert_model = BertModel.from_pretrained("bert-base-uncased")
 model = BERT_Regression(bert_model, args.hidden_size, args.dropout)
 model = model.to(device)
 
-train_dataloader, validation_dataloader, test_dataloader = get_all_dataloader(args.data_dir, args.processed_dir, args.batch_size)
+# train_dataloader, validation_dataloader, test_dataloader = get_all_dataloader(args.data_dir, args.processed_dir, args.batch_size)
+train_dataloader, validation_dataloader, test_dataloader = get_all_dataloader(args.processed_dir, args.datafile, args.dictfile, args.batch_size)
+
 print ("    Number of training examples ", len(train_dataloader))
 print ("    Number of dev examples ", len(validation_dataloader))
 print ("    Number of test examples ", len(test_dataloader))
