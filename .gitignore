@@ -1,4 +1,5 @@
 *.ipynb
+data/processed/*.gz
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
