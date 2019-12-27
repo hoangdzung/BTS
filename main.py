@@ -50,6 +50,7 @@ def get_mse(model, dataloader, scaler):
     model.eval()
 
     eval_mse = 0
+    n_samples = 0
     for batch in tqdm(dataloader, desc="eval"):
         batch = tuple(t.to(device) for t in batch)
         b_input_t_ids, b_input_t_mask, b_input_d_ids, b_input_d_mask, b_labels = batch
@@ -66,8 +67,9 @@ def get_mse(model, dataloader, scaler):
         tmp_eval_mse = np.abs(preds_rescaled - b_labels_rescaled).sum()
         #import pdb;pdb.set_trace()
         eval_mse += tmp_eval_mse
+        n_samples += b_input_d_ids.shape[0]
 
-    return eval_mse/len(dataloader)
+    return eval_mse/n_samples
 
 
 bert_model = BertModel.from_pretrained("bert-base-uncased")
@@ -126,10 +128,10 @@ for epoch_i in range(args.epochs):
     print("")
     print("  Average training loss: {0:.2f}".format(avg_train_loss))
 
-    val_mse = get_mse(model, validation_dataloader, scaler)/args.batch_size
+    val_mse = get_mse(model, validation_dataloader, scaler)
     if val_mse < best_val_mse:
         best_val_mse = val_mse
-        test_mse = get_mse(model, test_dataloader, scaler)/args.batch_size
+        test_mse = get_mse(model, test_dataloader, scaler)
     print(" Val mse {}, test mse {}".format(val_mse, test_mse))
 
 print("")
