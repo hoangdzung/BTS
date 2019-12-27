@@ -15,7 +15,7 @@ class BERT_Regression(nn.Module):
             nn.Dropout(dropout),
             # nn.PReLU(),
             # nn.Linear(hidden_size, 1)
-            nn.Linear(768, 1),
+            nn.Linear(768*2, 1),
             nn.Sigmoid()
         )
         self.apply(weights_init)
@@ -25,8 +25,8 @@ class BERT_Regression(nn.Module):
         hidden_bert2, _ = self.BERT_base(token_ids2, attention_mask=masks2)
         out_bert1 = hidden_bert1.mean(1)
         out_bert2 = hidden_bert2.mean(1)
-        #out_bert = torch.mean([out_bert1, out_bert2], dim=1)
-        out_bert = out_bert1+out_bert2
+        out_bert = torch.cat([out_bert1, out_bert2], dim=1)
+        # out_bert = out_bert1+out_bert2
         out = self.linear_model(out_bert)
         
         return out
