@@ -189,7 +189,7 @@ def get_all_dataloader(processed_dir, datafile, dictfile, batch_size):
         # np.savez(processed_test_path, inputs=test_inputs, masks=test_masks, labels=test_labels)
 
     train_dataloader = get_split_dataloader(train_t_inputs, train_t_masks, train_d_inputs, train_d_masks, train_labels, batch_size)
-    val_dataloader = get_split_dataloader(val_t_inputs, val_t_masks, val_d_inputs, val_d_masks, batch_size)
+    val_dataloader = get_split_dataloader(val_t_inputs, val_t_masks, val_d_inputs, val_d_masks, val_labels, batch_size)
     test_dataloader = get_split_dataloader(test_t_inputs, test_t_masks,test_d_inputs, test_d_masks, test_labels, batch_size)
 
     return train_dataloader, val_dataloader, test_dataloader
