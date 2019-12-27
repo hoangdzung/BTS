@@ -15,7 +15,8 @@ class BERT_Regression(nn.Module):
             nn.Dropout(dropout),
             # nn.PReLU(),
             # nn.Linear(hidden_size, 1)
-            nn.Linear(768, 1)
+            nn.Linear(768, 1),
+            nn.Sigmoid()
         )
         self.apply(weights_init)
 

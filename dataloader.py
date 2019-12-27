@@ -10,6 +10,7 @@ import os
 import logging
 import gzip
 import _pickle as cPickle
+from sklearn.preprocessing import MinMaxScaler
 
 logging.getLogger("transformers.tokenization_utils").setLevel(logging.ERROR)
 tokenizer = BertTokenizer.from_pretrained('bert-base-uncased', do_lower_case=True)
@@ -187,9 +188,17 @@ def get_all_dataloader(processed_dir, datafile, dictfile, batch_size):
         # np.savez(processed_train_path, inputs=train_inputs, masks=train_masks, labels=train_labels)
         # np.savez(processed_val_path, inputs=val_inputs, masks=val_masks, labels=val_labels)
         # np.savez(processed_test_path, inputs=test_inputs, masks=test_masks, labels=test_labels)
+    
+    scaler = MinMaxScaler()
+    all_labels=np.concatenate([train_labels, test_labels, val_labels]).reshape(-1,1)
+    scaler.fit(all_labels)
+
+    train_labels = np.squeeze(scaler.transform(train_labels.reshape(-1,1)))
+    val_labels = np.squeeze(scaler.transform(val_labels.reshape(-1,1)))
+    test_labels = np.squeeze(scaler.transform(test_labels.reshape(-1,1)))
 
     train_dataloader = get_split_dataloader(train_t_inputs, train_t_masks, train_d_inputs, train_d_masks, train_labels, batch_size)
     val_dataloader = get_split_dataloader(val_t_inputs, val_t_masks, val_d_inputs, val_d_masks, val_labels, batch_size)
     test_dataloader = get_split_dataloader(test_t_inputs, test_t_masks,test_d_inputs, test_d_masks, test_labels, batch_size)
-
-    return train_dataloader, val_dataloader, test_dataloader
+    
+    return train_dataloader, val_dataloader, test_dataloader, scaler
