@@ -84,7 +84,7 @@ print ("    Number of dev examples ", len(validation_dataloader))
 print ("    Number of test examples ", len(test_dataloader))
 
 optimizer = AdamW(model.BERT_base.parameters(),lr = args.lr)
-optimizer2 = AdamW(model.linear_model.parameters(),lr = args.lr2)
+optimizer2 = AdamW(model.linear_model.parameters(),lr = args.lr2)#, weight_decay=5e-4)
 total_steps = len(train_dataloader) * args.epochs
 if new_version:
     scheduler = get_linear_schedule_with_warmup(optimizer,
@@ -131,7 +131,7 @@ for epoch_i in range(args.epochs):
     val_mse = get_mse(model, validation_dataloader, scaler)
     if val_mse < best_val_mse:
         best_val_mse = val_mse
-        test_mse = get_mse(model, test_dataloader, scaler)
+    test_mse = get_mse(model, test_dataloader, scaler)
     print(" Val mse {}, test mse {}".format(val_mse, test_mse))
 
 print("")

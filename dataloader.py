@@ -96,30 +96,29 @@ def processs_data(datafile, dictfile):
     train_t, train_d, train_labels, \
     valid_t, valid_d, val_labels, \
     test_t, test_d, test_labels = cPickle.load(f_data,encoding='latin1')
-
     train_sen_t_set = []
     for idx_set in train_t:
-        train_sen_t_set.append(' '.join([iv_dictionary[i] for i in idx_set]))
+        train_sen_t_set.append(' '.join([iv_dictionary[i] if i <=500 else iv_dictionary[0] for i in idx_set][:100]))
 
     train_sen_d_set = []
     for idx_set in train_d:
-        train_sen_d_set.append(' '.join([iv_dictionary[i] for i in idx_set]))
+        train_sen_d_set.append(' '.join([iv_dictionary[i]  if i <=500 else iv_dictionary[0] for i in idx_set][:100]))
 
     val_sen_t_set = []
     for idx_set in valid_t:
-        val_sen_t_set.append(' '.join([iv_dictionary[i] for i in idx_set]))
+        val_sen_t_set.append(' '.join([iv_dictionary[i]  if i <=500 else iv_dictionary[0] for i in idx_set][:100]))
     
     val_sen_d_set = []
     for idx_set in valid_d:
-        val_sen_d_set.append(' '.join([iv_dictionary[i] for i in idx_set]))
+        val_sen_d_set.append(' '.join([iv_dictionary[i]  if i <=500 else iv_dictionary[0] for i in idx_set][:100]))
 
     test_sen_t_set = []
     for idx_set in test_t:
-        test_sen_t_set.append(' '.join([iv_dictionary[i] for i in idx_set]))
+        test_sen_t_set.append(' '.join([iv_dictionary[i] if i <=500 else iv_dictionary[0]  for i in idx_set][:100]))
     
     test_sen_d_set = []
     for idx_set in test_d:
-        test_sen_d_set.append(' '.join([iv_dictionary[i] for i in idx_set]))
+        test_sen_d_set.append(' '.join([iv_dictionary[i] if i <=500 else iv_dictionary[0]  for i in idx_set][:100]))
 
     train_t_inputs, train_t_masks, train_labels = get_data([train_sen_t_set], [train_labels])
     train_d_inputs, train_d_masks, train_labels = get_data([train_sen_d_set], [train_labels])
