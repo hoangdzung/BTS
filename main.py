@@ -25,6 +25,7 @@ parser.add_argument('--processed_dir', default='./data/processed')
 parser.add_argument('--datafile')
 parser.add_argument('--dictfile')
 
+parser.add_argument('--n_highway', type=int, default=4)
 parser.add_argument('--hidden_size', type=int, default=128)
 parser.add_argument('--dropout', type=float, default=0.0)
 
@@ -73,7 +74,7 @@ def get_mse(model, dataloader, scaler):
 
 
 bert_model = BertModel.from_pretrained("bert-base-uncased")
-model = BERT_Regression(bert_model, args.hidden_size, args.dropout)
+model = BERT_Regression(bert_model, args.hidden_size, args.dropout, args.n_highway)
 model = model.to(device)
 
 # train_dataloader, validation_dataloader, test_dataloader = get_all_dataloader(args.data_dir, args.processed_dir, args.batch_size)

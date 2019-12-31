@@ -1,5 +1,6 @@
 import torch
 import torch.nn as nn 
+from rhn import HighwayBlock
 
 def weights_init(m):
     if isinstance(m, nn.Linear):
@@ -7,9 +8,11 @@ def weights_init(m):
 
 class BERT_Regression(nn.Module):
     """The main model."""
-    def __init__(self, bert_model, hidden_size, dropout=0.5):
+    def __init__(self, bert_model, hidden_size, n_highway=4, dropout=0.5):
         super().__init__()
+        self.n_highway = n_highway
         self.BERT_base =  bert_model
+        self.rhn = HighwayBlock(2*768)
         self.linear_model = nn.Sequential(
             #nn.Linear(768*2, hidden_size),
             nn.Dropout(dropout),
@@ -26,6 +29,8 @@ class BERT_Regression(nn.Module):
         out_bert1 = hidden_bert1.mean(1)
         out_bert2 = hidden_bert2.mean(1)
         out_bert = torch.cat([out_bert1, out_bert2], dim=1)
+        for _ in range(self.n_highway):
+            out_bert = self.rhn(out_bert)
         #out_bert = out_bert1+out_bert2
         out = self.linear_model(out_bert)
         #out2 = torch.sigmoid(out_bert.mean(1,keepdim=True))
