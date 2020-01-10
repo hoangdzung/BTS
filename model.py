@@ -12,14 +12,15 @@ class BERT_Regression(nn.Module):
         super().__init__()
         self.n_highway = n_highway
         self.BERT_base =  bert_model
-        self.rhn = HighwayBlock(2*768)
+        self.rhn = HighwayBlock(768)
+        self.dropout= nn.Dropout(dropout)
         self.linear_model = nn.Sequential(
             #nn.Linear(768*2, hidden_size),
             nn.Dropout(dropout),
             #nn.ReLU(),
             #nn.Linear(768, 1),
-            nn.Linear(768*2, 1),
-            nn.Sigmoid()
+            nn.Linear(768, 1),
+            #nn.Sigmoid()
         )
         self.apply(weights_init)
 
@@ -28,10 +29,11 @@ class BERT_Regression(nn.Module):
         hidden_bert2, out_bert2 = self.BERT_base(token_ids2, attention_mask=masks2)
         out_bert1 = hidden_bert1.mean(1)
         out_bert2 = hidden_bert2.mean(1)
-        out_bert = torch.cat([out_bert1, out_bert2], dim=1)
+        # out_bert = torch.cat([out_bert1, out_bert2], dim=1)
+        out_bert = (out_bert1+out_bert2)/2
+        out_bert = self.dropout(out_bert)
         for _ in range(self.n_highway):
             out_bert = self.rhn(out_bert)
-        #out_bert = out_bert1+out_bert2
         out = self.linear_model(out_bert)
         #out2 = torch.sigmoid(out_bert.mean(1,keepdim=True))
         return out

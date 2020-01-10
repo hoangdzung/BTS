@@ -62,10 +62,11 @@ def get_mse(model, dataloader, scaler):
         b_labels = b_labels.detach().cpu().numpy().reshape(-1,1)
         preds = preds.detach().cpu().numpy().reshape(-1,1)
 
-        b_labels_rescaled = scaler.inverse_transform(b_labels)
-        preds_rescaled = scaler.inverse_transform(preds)
+        #b_labels_rescaled = scaler.inverse_transform(b_labels)
+        #preds_rescaled = scaler.inverse_transform(preds)
         
-        tmp_eval_mse = np.abs(preds_rescaled - b_labels_rescaled).sum()
+        #tmp_eval_mse = np.abs(preds_rescaled - b_labels_rescaled).sum()
+        tmp_eval_mse = np.abs(preds - b_labels).sum()
         #import pdb;pdb.set_trace()
         eval_mse += tmp_eval_mse
         n_samples += b_input_d_ids.shape[0]
@@ -74,7 +75,7 @@ def get_mse(model, dataloader, scaler):
 
 
 bert_model = BertModel.from_pretrained("bert-base-uncased")
-model = BERT_Regression(bert_model, args.hidden_size, args.dropout, args.n_highway)
+model = BERT_Regression(bert_model, args.hidden_size, args.n_highway,args.dropout)
 model = model.to(device)
 
 # train_dataloader, validation_dataloader, test_dataloader = get_all_dataloader(args.data_dir, args.processed_dir, args.batch_size)
@@ -85,7 +86,10 @@ print ("    Number of dev examples ", len(validation_dataloader))
 print ("    Number of test examples ", len(test_dataloader))
 
 optimizer = AdamW(model.BERT_base.parameters(),lr = args.lr)
-optimizer2 = AdamW(model.linear_model.parameters(),lr = args.lr2)#, weight_decay=5e-4)
+optimizer2 = AdamW([
+            {'params': model.linear_model.parameters()},
+            {'params': model.rhn.parameters()} 
+            ],lr = args.lr2)
 total_steps = len(train_dataloader) * args.epochs
 if new_version:
     scheduler = get_linear_schedule_with_warmup(optimizer,

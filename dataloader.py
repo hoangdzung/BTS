@@ -192,9 +192,9 @@ def get_all_dataloader(processed_dir, datafile, dictfile, batch_size):
     all_labels=np.concatenate([train_labels, test_labels, val_labels]).reshape(-1,1)
     scaler.fit(all_labels)
 
-    train_labels = np.squeeze(scaler.transform(train_labels.reshape(-1,1)))
-    val_labels = np.squeeze(scaler.transform(val_labels.reshape(-1,1)))
-    test_labels = np.squeeze(scaler.transform(test_labels.reshape(-1,1)))
+    #train_labels = np.squeeze(scaler.transform(train_labels.reshape(-1,1)))
+    #val_labels = np.squeeze(scaler.transform(val_labels.reshape(-1,1)))
+    #test_labels = np.squeeze(scaler.transform(test_labels.reshape(-1,1)))
 
     train_dataloader = get_split_dataloader(train_t_inputs, train_t_masks, train_d_inputs, train_d_masks, train_labels, batch_size)
     val_dataloader = get_split_dataloader(val_t_inputs, val_t_masks, val_d_inputs, val_d_masks, val_labels, batch_size)
