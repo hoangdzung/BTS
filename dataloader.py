@@ -166,23 +166,23 @@ def get_all_dataloader(processed_dir, datafile, dictfile, batch_size):
         Create 3 dataloaders 
     
     """
-    if not os.path.isdir(processed_dir):
-        os.mkdir(processed_dir)
-    processed_train_path = os.path.join(processed_dir, 'train.npz')
-    processed_val_path = os.path.join(processed_dir, 'val.npz')
-    processed_test_path = os.path.join(processed_dir, 'test.npz')
+    #if not os.path.isdir(processed_dir):
+    #    os.mkdir(processed_dir)
+    #processed_train_path = os.path.join(processed_dir, 'train.npz')
+    #processed_val_path = os.path.join(processed_dir, 'val.npz')
+    #processed_test_path = os.path.join(processed_dir, 'test.npz')
 
     # If already processed
-    if os.path.isfile(processed_train_path) and os.path.isfile(processed_test_path) and os.path.isfile(processed_val_path):
-        train_inputs, train_masks, train_labels = load_from_npz(processed_train_path)
-        val_inputs, val_masks, val_labels = load_from_npz(processed_val_path)
-        test_inputs, test_masks, test_labels = load_from_npz(processed_test_path)
+    #if os.path.isfile(processed_train_path) and os.path.isfile(processed_test_path) and os.path.isfile(processed_val_path):
+    #    train_inputs, train_masks, train_labels = load_from_npz(processed_train_path)
+    #    val_inputs, val_masks, val_labels = load_from_npz(processed_val_path)
+    #    test_inputs, test_masks, test_labels = load_from_npz(processed_test_path)
 
     # Else process
-    else:
-        (train_t_inputs, train_t_masks, train_d_inputs, train_d_masks, train_labels), \
-        (val_t_inputs, val_t_masks, val_d_inputs, val_d_masks, val_labels), \
-        (test_t_inputs, test_t_masks,test_d_inputs, test_d_masks, test_labels) = processs_data(datafile, dictfile)
+    #else:
+    (train_t_inputs, train_t_masks, train_d_inputs, train_d_masks, train_labels), \
+    (val_t_inputs, val_t_masks, val_d_inputs, val_d_masks, val_labels), \
+    (test_t_inputs, test_t_masks,test_d_inputs, test_d_masks, test_labels) = processs_data(datafile, dictfile)
         
         # np.savez(processed_train_path, inputs=train_inputs, masks=train_masks, labels=train_labels)
         # np.savez(processed_val_path, inputs=val_inputs, masks=val_masks, labels=val_labels)
